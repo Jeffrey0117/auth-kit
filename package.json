@@ -1,0 +1,12 @@
+{
+  "name": "auth-kit",
+  "version": "0.1.0",
+  "description": "無函式庫的驗證原語 — PBKDF2 密碼雜湊 + HMAC-SHA256 JWT。零依賴、timing-safe、擋 alg 混淆。不用 bcrypt/jsonwebtoken。",
+  "main": "index.js",
+  "scripts": {
+    "example": "node example.js"
+  },
+  "keywords": ["auth", "jwt", "pbkdf2", "password-hashing", "hmac", "zero-dependency", "self-hosted"],
+  "author": "Jeffrey0117",
+  "license": "MIT"
+}
