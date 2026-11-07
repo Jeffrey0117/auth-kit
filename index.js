@@ -1,6 +1,20 @@
 // ============================================================================
 // auth-kit — 無函式庫的驗證原語（PBKDF2 密碼雜湊 + HMAC-SHA256 JWT）
 // ----------------------------------------------------------------------------
+// ⛔ 守備範圍：這個 kit 是給「**自己**發 session」用的 —— 你是簽發者也是驗證
+//    者,secret 兩邊都是你。
+//
+//    **不要拿它去驗別人家 IdP（LetMeUse / Auth0 / Clerk…）發的 token。**
+//    那種情境用對稱簽章等於「驗證方必須握著簽發金鑰」,app secret 一外洩,
+//    任何人都能自簽一顆 sub/role 隨便填的 token 冒充任何人（Jeff 生態系
+//    2026-10-25 pokkit 事件根因）。那個情境請用:
+//        github:Jeffrey0117/jwks-verify-kit   （ES256 + JWKS 公鑰,驗證方零 secret）
+//
+// ⚠️ iat/exp 的單位是**毫秒**（`Date.now()`）,不是 RFC 7519 的秒。自己發自己
+//    驗沒問題,但任何第三方函式庫（jose 等）讀這種 token 會把 exp 當成西元
+//    五萬年。要跟外界互通就得改單位 —— 改了會讓既有已發出的 token 全部失效,
+//    所以目前刻意不動,在這裡記一筆。
+// ----------------------------------------------------------------------------
 // 零依賴（只用 node 內建 crypto）。不用 bcrypt / jsonwebtoken，一個檔搞定
 // 註冊登入需要的兩件事：安全存密碼、發/驗無狀態 token。
 // 比對一律 timingSafeEqual、JWT 檢查 alg（擋 alg 混淆）。
@@ -62,7 +76,11 @@ module.exports = function createAuth(opts = {}) {
       const header = JSON.parse(Buffer.from(h, 'base64url').toString());
       if (header.alg !== 'HS256') return null; // 擋 alg 混淆 / none
       const payload = JSON.parse(Buffer.from(p, 'base64url').toString());
-      if (!payload.exp || payload.exp < Date.now()) return null;
+      // exp 必須是數字。寫成 `!payload.exp ||` 的話,字串型 exp 會兩邊都躲過
+      // （`!"abc"` 是 false、`"abc" < Date.now()` 也是 false）→ 永不過期。
+      // signJWT 一律寫入數字,所以這條不會擋掉自己發的 token。
+      if (typeof payload.exp !== 'number' || !Number.isFinite(payload.exp)) return null;
+      if (payload.exp < Date.now()) return null;
       return payload;
     } catch (e) { return null; }
   }
