@@ -1,0 +1,10 @@
+{
+  "repo": 1,
+  "name": "auth-kit",
+  "what": "無函式庫的驗證原語 — PBKDF2 密碼雜湊 + HMAC-SHA256 JWT。零依賴、timing-safe、擋 alg 混淆。不用 bcrypt/jsonwebtoken。",
+  "kind": "kit",
+  "work": {
+    "guide": "README.md",
+    "test": "npm test"
+  }
+}
