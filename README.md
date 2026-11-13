@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.svg" width="96" height="96" alt="auth-kit logo">
+</p>
+
 # auth-kit 🔑
 
 **無函式庫的驗證原語。** PBKDF2 密碼雜湊 + HMAC-SHA256 JWT，一個檔搞定註冊登入。
