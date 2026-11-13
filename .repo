@@ -6,5 +6,37 @@
   "work": {
     "guide": "README.md",
     "test": "npm test"
-  }
+  },
+  "offers": [
+    {
+      "id": "create_auth",
+      "what": "自己發 session 用：傳入私有 secret，回傳 hashPassword / verifyPassword / signJWT / verifyJWT / tokenFromRequest 五個函式。只驗自己發的 session，別拿去驗外部 IdP（LetMeUse / Auth0 / Clerk）的 token，那個用 jwks-verify-kit。",
+      "how": "import",
+      "import": "const auth = require('auth-kit')({ secret: process.env.JWT_SECRET })"
+    },
+    {
+      "id": "hash_password",
+      "what": "auth.hashPassword(pw) 用 PBKDF2 產生 \"salt:hash\" 存進 DB；auth.verifyPassword(pw, stored) 做 constant-time 比對，永不 throw。註冊登入要安全存密碼、又不想裝 bcrypt 時用。",
+      "how": "import",
+      "import": "const auth = require('auth-kit')({ secret: process.env.JWT_SECRET })"
+    },
+    {
+      "id": "session_jwt",
+      "what": "auth.signJWT(payload, expiresInMs?) 發 HS256 無狀態 token（預設 7 天）；auth.verifyJWT(token) 驗簽章、alg、到期，回 payload 或 null，永不 throw。注意 iat/exp 單位是毫秒不是秒，第三方函式庫讀不對。",
+      "how": "import",
+      "import": "const auth = require('auth-kit')({ secret: process.env.JWT_SECRET })"
+    },
+    {
+      "id": "token_from_request",
+      "what": "auth.tokenFromRequest(req, cookieName?) 從 Authorization: Bearer 或指定 cookie 取出 token，取不到回 null。每個請求驗 session 前先用它拿 token。",
+      "how": "import",
+      "import": "const auth = require('auth-kit')({ secret: process.env.JWT_SECRET })"
+    },
+    {
+      "id": "skill",
+      "what": "專案要自己做註冊登入、存密碼、發 session token 時載入的打法（何時觸發、接線、地雷）。",
+      "how": "skill",
+      "skill": "auth-kit"
+    }
+  ]
 }
